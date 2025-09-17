@@ -15,12 +15,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class CollectionResource extends Resource
 {
     protected static ?string $model = Collection::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Squares2x2;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Shop';
 
     public static function form(Schema $schema): Schema
     {
@@ -52,5 +55,10 @@ class CollectionResource extends Resource
             'view' => ViewCollection::route('/{record}'),
             'edit' => EditCollection::route('/{record}/edit'),
         ];
+    }
+
+    public static function getDefaultTranslatableLocale(): string
+    {
+        return app()->getLocale();
     }
 }

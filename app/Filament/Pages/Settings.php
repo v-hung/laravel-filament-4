@@ -21,9 +21,9 @@ class Settings extends PageSettingsTranslatable
     {
         return $schema
             ->components([
-                \Filament\Forms\Components\TextInput::make('site_name')->label(FormHelper::localizedLabel("site_name")),
-                \Filament\Forms\Components\TextInput::make('site_logo')->label(FormHelper::localizedLabel("site_logo")),
-                \Filament\Forms\Components\TextArea::make('site_description')->label(FormHelper::localizedLabel("site_description"))
+                \Filament\Forms\Components\TextInput::make('site_name')->label(FormHelper::localizedLabel("Site Name")),
+                \Filament\Forms\Components\TextInput::make('site_logo')->label(FormHelper::localizedLabel("Site Logo")),
+                \Filament\Forms\Components\TextArea::make('site_description')->label(FormHelper::localizedLabel("Site Description"))
             ])->statePath('data');
     }
 }

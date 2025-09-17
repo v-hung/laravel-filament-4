@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('collections', function (Blueprint $table) {
             $table->id();
-            $table->json('name');
+            $table->json('title');
             $table->json('slug');
             $table->json('description')->nullable();
             $table->string('status')->nullable();

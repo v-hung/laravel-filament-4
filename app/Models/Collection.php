@@ -12,10 +12,12 @@ class Collection extends Model
     use HasTranslations;
 
     public array $translatable = [
-        'name',
+        'title',
         'slug',
         'description',
     ];
+
+    protected $guarded = [];
 
     protected $casts = [
         'status' => CategoryStatus::class,
@@ -23,6 +25,6 @@ class Collection extends Model
 
     public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class);
+        return $this->belongsToMany(Product::class, "product_collection");
     }
 }

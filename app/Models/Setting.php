@@ -10,4 +10,6 @@ class Setting extends Model
     use HasTranslations;
 
     public array $translatable = ['value'];
+
+    protected $guarded = [];
 }

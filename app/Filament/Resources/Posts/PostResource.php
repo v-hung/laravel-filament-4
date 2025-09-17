@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use UnitEnum;
 
 class PostResource extends Resource
 {
@@ -23,7 +24,11 @@ class PostResource extends Resource
 
     protected static ?string $model = Post::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentText;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Content';
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
@@ -55,5 +60,10 @@ class PostResource extends Resource
             'view' => ViewPost::route('/{record}'),
             'edit' => EditPost::route('/{record}/edit'),
         ];
+    }
+
+    public static function getDefaultTranslatableLocale(): string
+    {
+        return app()->getLocale();
     }
 }

@@ -12,10 +12,12 @@ class Blog extends Model
     use HasTranslations;
 
     public array $translatable = [
-        'name',
+        'title',
         'slug',
         'description',
     ];
+
+    protected $guarded = [];
 
     protected $casts = [
         'status' => CategoryStatus::class,
@@ -23,6 +25,6 @@ class Blog extends Model
 
     public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class);
+        return $this->belongsToMany(Post::class, "post_blog");
     }
 }

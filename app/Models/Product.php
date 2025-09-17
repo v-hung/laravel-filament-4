@@ -20,8 +20,10 @@ class Product extends Model
         'images' => 'array',
     ];
 
-    public function categories(): BelongsToMany
+    protected $guarded = [];
+
+    public function collections(): BelongsToMany
     {
-        return $this->belongsToMany(Collection::class);
+        return $this->belongsToMany(Collection::class, "product_collection");
     }
 }

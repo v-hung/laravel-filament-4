@@ -15,14 +15,18 @@ class Post extends Model
         'title',
         'slug',
         'description',
+        'content'
     ];
 
     protected $casts = [
         'status' => ContentStatus::class,
+        'images' => 'array',
     ];
 
-    public function categories(): BelongsToMany
+    protected $guarded = [];
+
+    public function blogs(): BelongsToMany
     {
-        return $this->belongsToMany(Blog::class);
+        return $this->belongsToMany(Blog::class, "post_blog");
     }
 }

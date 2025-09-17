@@ -13,12 +13,20 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use UnitEnum;
 
 class BlogResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = Blog::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::PencilSquare;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Content';
+
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
@@ -44,5 +52,10 @@ class BlogResource extends Resource
             'create' => CreateBlog::route('/create'),
             'edit' => EditBlog::route('/{record}/edit'),
         ];
+    }
+
+    public static function getDefaultTranslatableLocale(): string
+    {
+        return app()->getLocale();
     }
 }
