@@ -3,26 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Enums\ContentStatus;
+use Spatie\Translatable\HasTranslations;
 
-class Post extends Model
+class Product extends Model
 {
     use HasTranslations;
 
     public array $translatable = [
-        'title',
+        'name',
         'slug',
         'description',
     ];
 
     protected $casts = [
-        'status' => ContentStatus::class,
+        'images' => 'array',
     ];
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Blog::class);
+        return $this->belongsToMany(Collection::class);
     }
 }

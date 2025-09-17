@@ -28,5 +28,7 @@ class AppServiceProvider extends ServiceProvider
             $switch
                 ->locales(['en', 'vi']); // also accepts a closure
         });
+
+        // app()->instance('settings', (new SettingRepository)->getAll());
     }
 }
