@@ -2,16 +2,16 @@
 
 namespace App\Filament\Resources\Posts\Pages;
 
+use App\Filament\Core\Resources\EditTranslatable;
 use App\Filament\Resources\Posts\PostResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
-use LaraZeus\SpatieTranslatable\Resources\Pages\EditRecord\Concerns\Translatable;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 
 class EditPost extends EditRecord
 {
-    use Translatable;
+    use EditTranslatable;
 
     protected static string $resource = PostResource::class;
 
