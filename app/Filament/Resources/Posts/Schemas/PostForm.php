@@ -40,7 +40,6 @@ class PostForm
                     }),
                 TextInput::make('description')->maxLength(255)->columnSpan('full'),
                 RichEditor::make('content')
-                    // ->json()
                     ->columnSpan('full')
                     ->extraInputAttributes(['style' => 'min-height: 20rem;']),
                 FileUpload::make('images')

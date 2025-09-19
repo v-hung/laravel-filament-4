@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -15,8 +16,10 @@ class PagesTable
     {
         return $table
             ->columns([
-                TextColumn::make('status')
-                    ->searchable(),
+                TextColumn::make('title')->searchable(),
+                TextColumn::make('slug')->searchable(),
+                ImageColumn::make('images'),
+                TextColumn::make('status')->badge(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 
 abstract class Controller
 {
     protected function view($data = [], $mergeData = [])
     {
+        // $action = Route::current()?->getActionName();
         $action = Route::currentRouteAction();
 
         if (!$action) {

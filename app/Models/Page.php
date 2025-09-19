@@ -20,5 +20,6 @@ class Page extends Model
 
     protected $casts = [
         'status' => ContentStatus::class,
+        'images' => 'array',
     ];
 }

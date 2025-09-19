@@ -19,8 +19,8 @@ class PostInfolist
                     ->copyMessage('Copied!')
                     ->copyMessageDuration(1500),
                 TextEntry::make('description')->columnSpanFull(),
-                // TextEntry::make('content')
-                //     ->columnSpanFull()->html(),
+                TextEntry::make('content')
+                    ->columnSpanFull()->html(),
                 ImageEntry::make('images'),
                 TextEntry::make('created_at')
                     ->dateTime()

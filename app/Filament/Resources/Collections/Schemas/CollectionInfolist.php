@@ -11,6 +11,12 @@ class CollectionInfolist
     {
         return $schema
             ->components([
+                TextEntry::make('title'),
+                TextEntry::make('slug')
+                    ->copyable()
+                    ->copyMessage('Copied!')
+                    ->copyMessageDuration(1500),
+                TextEntry::make('description')->columnSpanFull(),
                 TextEntry::make('status')
                     ->badge()
                     ->placeholder('-'),

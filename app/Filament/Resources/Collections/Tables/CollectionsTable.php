@@ -15,6 +15,8 @@ class CollectionsTable
     {
         return $table
             ->columns([
+                TextColumn::make('title')->searchable(),
+                TextColumn::make('slug')->searchable(),
                 TextColumn::make('status')
                     ->badge()
                     ->searchable(),
