@@ -1,4 +1,5 @@
 {
 	"commentTranslate.source": "Google",
-	"commentTranslate.targetLanguage": "en"
+	"commentTranslate.targetLanguage": "en",
+	"postman.settings.dotenv-detection-notification-visibility": false
 }
