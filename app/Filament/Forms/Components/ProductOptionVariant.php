@@ -12,6 +12,11 @@ class ProductOptionVariant extends Field
     {
         parent::setUp();
 
+        $this->default([
+            'options' => [],
+            'variants' => [],
+        ]);
+
         $this->dehydrated(false);
     }
 }

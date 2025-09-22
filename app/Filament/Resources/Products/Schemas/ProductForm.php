@@ -3,10 +3,12 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Enums\ProductStatus;
+use App\Filament\Forms\Components\ProductOptionVariant;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
@@ -60,6 +62,9 @@ class ProductForm
                     ->searchable()
                     ->preload()
                     ->required(),
+                Section::make([
+                    ProductOptionVariant::make('variants'),
+                ])->columnSpan('full'),
                 Select::make('status')
                     ->options(ProductStatus::class)
                     ->default(ProductStatus::Active),
