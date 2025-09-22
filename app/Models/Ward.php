@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ward extends Model
 {
+    protected $guarded = [];
+
     public function province(): BelongsTo
     {
         return $this->belongsTo(Province::class, 'province_code', 'code');

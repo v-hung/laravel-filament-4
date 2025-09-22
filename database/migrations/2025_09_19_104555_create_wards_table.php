@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('wards', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->nullable()->uniqid();
+            $table->string('code')->unique()->nullable();
             $table->string('codename')->nullable();
             $table->string('division_type')->nullable();
             $table->string('name')->nullable();
-            $table->foreignId('province_code')->constrained('provinces')->cascadeOnDelete();
+            $table->string('province_code')->references('code')->on('provinces')->cascadeOnDelete();
             $table->timestamps();
         });
     }

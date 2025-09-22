@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('provinces', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->nullable()->uniqid();
+            $table->string('code')->unique()->nullable();
             $table->string('codename')->nullable();
             $table->string('division_type')->nullable();
             $table->string('name')->nullable();

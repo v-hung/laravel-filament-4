@@ -9,5 +9,5 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // sync data
-Route::get('provinces/syncAll', [ProvinceController::class, 'syncAll'])
+Route::post('provinces/syncAll', [ProvinceController::class, 'syncAll'])
     ->name('provinces.syncAll');
