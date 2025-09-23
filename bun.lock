@@ -2,6 +2,9 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
+      "dependencies": {
+        "@alpinejs/sort": "^3.15.0",
+      },
       "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
         "@tailwindcss/postcss": "^4.1.13",
@@ -19,6 +22,8 @@
   },
   "packages": {
     "@alloc/quick-lru": ["@alloc/quick-lru@5.2.0", "", {}, "sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw=="],
+
+    "@alpinejs/sort": ["@alpinejs/sort@3.15.0", "", {}, "sha512-ayRmcuGvqL2t9otuUiLaq6Rx8lYHAVok4TXdSXF97tcTaGLA1DN3/mwone8amCLlBar8FwVE6vak/4AtwRpWjw=="],
 
     "@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.25.9", "", { "os": "aix", "cpu": "ppc64" }, "sha512-OaGtL73Jck6pBKjNIe24BnFE6agGl+6KxDtTfHhy1HmhthfKouEcOhqpSL64K4/0WCtbKFLOdzD/44cJ4k9opA=="],
 

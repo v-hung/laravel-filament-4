@@ -1,34 +1,144 @@
 <x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
-    <div x-data="product_variants($wire, @js($getStatePath()))" {{ $getExtraAttributeBag() }} class="space-y-4">
+    <div x-data="product_variants($wire, @js($getStatePath()))" {{ $getExtraAttributeBag() }}class="space-y-4">
         <!-- Options -->
         <div>
-            {{-- <x-filament::button icon="heroicon-s-plus" outlined size="xs" color="gray"
-                class="absolute -top-8 right-0">
-                Add Option
-            </x-filament::button> --}}
+            <div class="border border-gray-300 rounded-lg mt-2 mb-4 overflow-hidden">
+                <div x-sort class="flex flex-col">
+                    <!-- dummy item -->
+                    <div x-sort:item="0" class="hidden">
+                        <span x-sort:handle></span>
+                    </div>
 
-            <div class="border border-gray-300 rounded-lg flex flex-col divide-solid divide-y divide-gray-200 mt-2 mb-4">
-                <div class="p-4">sdf</div>
-                <div class="p-4">sdf</div>
-                <div class="p-4">sdf</div>
-            </div>
+                    <template x-for="option in state.options" :key="option.id">
 
-            <template x-for="(option, i) in state.options" :key="i">
-                <div class="mt-2 p-2 border rounded">
-                    <input type="text" class="border px-2 py-1" x-model="option.name"
-                        placeholder="Option name (e.g. Size)" />
+                        <div x-sort:item="option.id" @click="openEditOption(option)"
+                            class="p-4 flex space-x-4 border-b border-gray-200 cursor-pointer">
+                            <x-tabler-grip-vertical x-sort:handle
+                                class="flex-none w-10 h-10 p-2 rounded hover:bg-gray-100 cursor-move" />
 
-                    <button type="button" class="ml-2 text-sm text-blue-500" @click="addValue(option)">+ Add
-                        Value</button>
+                            <div x-show="!option.edit">
+                                <div class="font-medium" x-text="option.name"></div>
+                                <div class="flex gap-x-3 mt-2">
+                                    <template x-for="value in option.values">
+                                        <x-filament::badge color="gray" x-text="value.label"></x-filament::badge>
+                                    </template>
+                                </div>
+                            </div>
 
-                    <div class="mt-2 flex flex-wrap gap-2">
-                        <template x-for="(value, j) in option.values" :key="j">
-                            <input type="text" class="border px-2 py-1" x-model="option.values[j]"
-                                placeholder="Value" />
-                        </template>
+                            <div x-show="option.edit" class="flex-1 min-w-0">
+                                <div>Option name</div>
+                                <x-filament::input.wrapper class="mt-2 w-full"
+                                    x-bind:class="errors.includes(`options.${option.id}.name`) ? 'fi-invalid' : ''">
+                                    <x-filament::input type="text" x-model="option.name"
+                                        @input="removeError(`options.${option.id}.name`)" />
+                                </x-filament::input.wrapper>
+
+                                <div class="mt-3">Option values</div>
+                                <div x-sort="sortValues($item, $position, option)"
+                                    class="flex flex-col gap-y-2 -ml-10 mt-2">
+                                    <!-- dummy item -->
+                                    <div x-sort:item="0" class="hidden">
+                                        <span x-sort:handle></span>
+                                    </div>
+
+                                    <template x-for="value in option.values" :key="value.id">
+                                        <div x-sort:item="value.id" class="flex items-center gap-x-2">
+                                            <x-tabler-grip-vertical x-sort:handle
+                                                class="flex-none w-8 h-8 p-2 rounded text-gray-500 hover:bg-gray-100 cursor-move" />
+
+                                            <x-filament::input.wrapper class="flex-1 min-w-0"
+                                                x-bind:class="errors.includes(`options.${option.id}.values.${value.id}`) ?
+                                                    'fi-invalid' : ''">
+                                                <x-filament::input type="text" x-model="value.label"
+                                                    @input="removeError(`options.${option.id}.values.${value.id}`)" />
+                                                <x-slot name="suffix">
+                                                    <x-heroicon-o-trash
+                                                        class="w-7 h-7 rounded p-1 text-red-600 hover:bg-red-100 cursor-pointer"
+                                                        @click="removeValue(value.id, option)" />
+                                                </x-slot>
+                                            </x-filament::input.wrapper>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <x-filament::input.wrapper class="mt-2"
+                                    x-bind:class="errors.includes('options.${option.id}.value') ? 'fi-invalid' : ''">
+                                    <x-filament::input type="text" placeholder="Add another value"
+                                        x-model="option.value" @keydown.enter.prevent.stop="addValue(option)"
+                                        @input="removeError(`options.${option.id}.value`)" />
+                                </x-filament::input.wrapper>
+
+                                <div class="mt-3 flex justify-between">
+                                    <x-filament::button size="xs" color="gray"
+                                        @click.prevent.stop="closeEditOption(option)">Delete</x-filament::button>
+                                    <x-filament::button size="xs"
+                                        @click.prevent.stop="addOption(option)">Done</x-filament::button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div x-show="!dataAddOption.edit" class="flex items-center p-4 cursor-pointer hover:bg-gray-100"
+                    @click="dataAddOption.edit = !dataAddOption.edit">
+                    <x-tabler-circle-plus class="mr-3" />
+                    Add another options
+                </div>
+                <div x-show="dataAddOption.edit" class="p-4 flex space-x-6">
+                    <x-tabler-grip-vertical class="flex-none w-10 h-10 p-2 rounded text-gray-400" />
+                    <div class="flex-1 min-w-0">
+                        <div>Option name</div>
+
+                        <x-filament::input.wrapper class="mt-2 w-full"
+                            x-bind:class="errors.includes('dataAddOption.name') ? 'fi-invalid' : ''">
+
+                            <x-filament::input type="text" x-model="dataAddOption.name"
+                                @input="removeError(`dataAddOption.name`)" />
+                        </x-filament::input.wrapper>
+
+                        <div class="mt-3">Option values</div>
+                        <div x-sort="sortValues($item, $position)" class="flex flex-col gap-y-2 -ml-10 mt-2">
+                            <!-- dummy item -->
+                            <div x-sort:item="0" class="hidden">
+                                <span x-sort:handle></span>
+                            </div>
+
+                            <template x-for="value in dataAddOption.values" :key="value.id">
+                                <div x-sort:item="value.id" class="flex items-center gap-x-2">
+                                    <x-tabler-grip-vertical x-sort:handle
+                                        class="flex-none w-8 h-8 p-2 rounded text-gray-500 hover:bg-gray-100 cursor-move" />
+
+                                    <x-filament::input.wrapper class="flex-1 min-w-0"
+                                        x-bind:class="errors.includes(`dataAddOption.values.${value.id}`) ? 'fi-invalid' : ''">
+                                        <x-filament::input type="text" x-model="value.label"
+                                            @input="removeError(`dataAddOption.values.${value.id}`)" />
+
+                                        <x-slot name="suffix">
+                                            <x-heroicon-o-trash
+                                                class="w-7 h-7 rounded p-1 text-red-600 hover:bg-red-100 cursor-pointer"
+                                                @click="removeValue(value.id)" />
+                                        </x-slot>
+                                    </x-filament::input.wrapper>
+                                </div>
+                            </template>
+                        </div>
+
+                        <x-filament::input.wrapper class="mt-2"
+                            x-bind:class="errors.includes('dataAddOption.value') ? 'fi-invalid' : ''">
+
+                            <x-filament::input type="text" placeholder="Add another value"
+                                x-model="dataAddOption.value" @keydown.enter.prevent.stop="addValue()"
+                                @input="removeError(`dataAddOption.value`)" />
+                        </x-filament::input.wrapper>
+
+                        <div class="mt-3 flex justify-between">
+                            <x-filament::button size="xs" color="gray"
+                                @click="closeEditOption()">Delete</x-filament::button>
+                            <x-filament::button size="xs" @click="addOption()">Done</x-filament::button>
+                        </div>
                     </div>
                 </div>
-            </template>
+            </div>
         </div>
 
         <!-- Variants Table -->
@@ -46,7 +156,8 @@
                                         class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Age
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Address
+                                        class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                        Address
                                     </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">Action
@@ -55,7 +166,8 @@
                             </thead>
                             <tbody class="divide-y divide-gray-200">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">John Brown
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">John
+                                        Brown
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">45</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">New York No. 1 Lake
@@ -70,7 +182,8 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">Jim Green
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">27</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">London No. 1 Lake Park
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">London No. 1 Lake
+                                        Park
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                                         <button type="button"
@@ -82,7 +195,8 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">Joe Black
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">31</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">Sidney No. 1 Lake Park
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">Sidney No. 1 Lake
+                                        Park
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                                         <button type="button"
@@ -99,25 +213,137 @@
 </x-dynamic-component>
 
 <script>
+    const useId = () => Date.now();
+
     document.addEventListener('alpine:init', () => {
         Alpine.data('product_variants', ($wire, statePath) => ({
             state: $wire.$entangle(statePath),
+            dataAddOption: {
+                name: '',
+                values: [],
+                edit: false,
+                value: '',
+            },
+            errors: [],
 
-            addOption() {
-                this.state.options.push({
-                    name: '',
-                    values: []
-                });
+            init() {
+                this.state.options = this.state.options.map(v => ({
+                    ...v,
+                    edit: false,
+                    value: '',
+                    original: JSON.parse(JSON.stringify(v))
+                }));
+            },
+
+            //  ======== OPTIONS ========
+            addOption(option) {
+                const currentOption = option ?? this.dataAddOption
+                const errorString = option ? `options.${option.id}` : 'dataAddOption'
+
+                if (!currentOption.name) {
+                    return this.addError(`${errorString}.name`)
+                }
+
+                if (currentOption.values.length == 0) {
+                    return this.addError(`${errorString}.value`)
+                }
+
+                for (value of currentOption.values) {
+                    if (!value.label) {
+                        return this.addError(`${errorString}.values.${value.id}`)
+                    }
+                }
+
+                if (!option) {
+                    this.state.options.push({
+                        id: useId(),
+                        name: currentOption.name,
+                        values: currentOption.values,
+                        edit: false,
+                        value: ''
+                    });
+                }
+
+                this.closeEditOption(option)
             },
 
             addValue(option) {
-                option.values.push('');
+                const currentOption = option ?? this.dataAddOption
+                const errorString = option ? `options.${option.id}` : 'dataAddOption'
+
+                if (!currentOption.value) {
+                    return this.addError(`${errorString}.value`)
+                }
+
+                currentOption.values.push({
+                    id: useId(),
+                    label: currentOption.value,
+                    position: currentOption.values.length + 1
+                })
+                currentOption.value = ''
             },
+
+            removeValue(id, option) {
+                const currentOption = option ?? this.dataAddOption
+                const errorString = option ? `options.${option.id}` : 'dataAddOption'
+
+                currentOption.values = currentOption.values.filter(v => v.id != id)
+                this.removeError(`${errorString}.values.${id}`)
+            },
+
+            sortValues(itemId, newPos, option) {
+                const currentOption = option ?? this.dataAddOption
+
+                const moved = currentOption.values.find(v => v.id === itemId)
+                if (!moved) return
+
+                const oldPos = moved.position
+                moved.position = newPos
+
+                currentOption.values.forEach(v => {
+                    if (v.id === itemId) return
+
+                    if (oldPos > newPos) {
+                        if (v.position >= newPos && v.position < oldPos) {
+                            v.position += 1
+                        }
+                    } else if (oldPos < newPos) {
+                        if (v.position > oldPos && v.position <= newPos) {
+                            v.position -= 1
+                        }
+                    }
+                })
+            },
+
+            openEditOption(option) {
+                option.edit = true;
+                option.original = JSON.parse(JSON.stringify(option));
+            },
+
+            closeEditOption(option) {
+                if (option) {
+                    option.name = option.original.name;
+                    option.values = JSON.parse(JSON.stringify(option.original.values));
+                    option.value = ''
+                    option.edit = false
+                } else {
+                    this.dataAddOption = {
+                        name: '',
+                        values: [],
+                        value: '',
+                        edit: false
+                    }
+                }
+            },
+            //  ======== END OPTIONS ========
+
+
+            //  ======== VARIANTS ========
 
             generateVariants() {
                 if (!this.state.options.length) return;
 
-                let arrays = this.state.options.map(o => o.values.filter(v => v !== ''));
+                let arrays = this.state.options.map(o => o.values.map(v => v.label));
                 let combos = this.cartesian(arrays);
 
                 this.state.variants = combos.map(c => ({
@@ -132,6 +358,18 @@
                 return arrays.reduce((a, b) =>
                     a.flatMap(d => b.map(e => [...(Array.isArray(d) ? d : [d]), e]))
                 );
+            }
+
+            //  ======== END VARIANTS ========
+
+            addError(name) {
+                if (!this.errors.includes(name)) {
+                    this.errors.push(name)
+                }
+            },
+
+            removeError(name) {
+                this.errors = this.errors.filter(v => v != name)
             }
         }))
     })
