@@ -68,9 +68,11 @@
                                         @input="removeError(`options.${option.id}.value`)" />
                                 </x-filament::input.wrapper>
 
-                                <div class="mt-3 flex justify-between">
+                                <div class="mt-3 flex gap-x-2">
                                     <x-filament::button size="xs" color="gray"
-                                        @click.prevent.stop="closeEditOption(option)">Delete</x-filament::button>
+                                        @click.prevent.stop="closeEditOption(option)">Close</x-filament::button>
+                                    <x-filament::button size="xs" color="danger" class="ml-auto"
+                                        @click.prevent.stop="deleteOption(option.id)">Delete</x-filament::button>
                                     <x-filament::button size="xs"
                                         @click.prevent.stop="addOption(option)">Done</x-filament::button>
                                 </div>
@@ -142,7 +144,7 @@
         </div>
 
         <!-- Variants Table -->
-        <div class="flex flex-col">
+        <div x-show="state.variants.length > 0" class="flex flex-col">
             <div class="-m-1.5 overflow-x-auto">
                 <div class="p-1.5 min-w-full inline-block align-middle">
                     <div class="border border-gray-200 rounded-lg shadow-xs overflow-hidden">
@@ -150,14 +152,15 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th scope="col"
-                                        class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Name
+                                        class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                        Variant
                                     </th>
                                     <th scope="col"
-                                        class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Age
+                                        class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Price
                                     </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                        Address
+                                        Stock
                                     </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">Action
@@ -165,44 +168,26 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">John
-                                        Brown
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">45</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">New York No. 1 Lake
-                                        Park</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                                        <button type="button"
-                                            class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none">Delete</button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">Jim Green
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">27</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">London No. 1 Lake
-                                        Park
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                                        <button type="button"
-                                            class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none">Delete</button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">Joe Black
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">31</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">Sidney No. 1 Lake
-                                        Park
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                                        <button type="button"
-                                            class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none">Delete</button>
-                                    </td>
-                                </tr>
+                                <template x-for="variant in state.variants" :key="variant.id">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800"
+                                            x-text="variant.name"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                            <x-filament::input.wrapper>
+                                                <x-filament::input type="text" />
+                                            </x-filament::input.wrapper>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                            <x-filament::input.wrapper>
+                                                <x-filament::input type="text" />
+                                            </x-filament::input.wrapper>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
+                                            <button type="button"
+                                                class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none">Delete</button>
+                                        </td>
+                                    </tr>
+                                </template>
                             </tbody>
                         </table>
                     </div>
@@ -212,9 +197,10 @@
     </div>
 </x-dynamic-component>
 
-<script>
-    const useId = () => Date.now();
-
+<script type="module">
+    import {
+        v7 as uuidv7
+    } from "https://cdn.jsdelivr.net/npm/uuid/dist/esm-browser/index.js";
     document.addEventListener('alpine:init', () => {
         Alpine.data('product_variants', ($wire, statePath) => ({
             state: $wire.$entangle(statePath),
@@ -236,36 +222,6 @@
             },
 
             //  ======== OPTIONS ========
-            addOption(option) {
-                const currentOption = option ?? this.dataAddOption
-                const errorString = option ? `options.${option.id}` : 'dataAddOption'
-
-                if (!currentOption.name) {
-                    return this.addError(`${errorString}.name`)
-                }
-
-                if (currentOption.values.length == 0) {
-                    return this.addError(`${errorString}.value`)
-                }
-
-                for (value of currentOption.values) {
-                    if (!value.label) {
-                        return this.addError(`${errorString}.values.${value.id}`)
-                    }
-                }
-
-                if (!option) {
-                    this.state.options.push({
-                        id: useId(),
-                        name: currentOption.name,
-                        values: currentOption.values,
-                        edit: false,
-                        value: ''
-                    });
-                }
-
-                this.closeEditOption(option)
-            },
 
             addValue(option) {
                 const currentOption = option ?? this.dataAddOption
@@ -276,7 +232,7 @@
                 }
 
                 currentOption.values.push({
-                    id: useId(),
+                    id: uuidv7(),
                     label: currentOption.value,
                     position: currentOption.values.length + 1
                 })
@@ -315,6 +271,38 @@
                 })
             },
 
+            addOption(option) {
+                const currentOption = option ?? this.dataAddOption
+                const errorString = option ? `options.${option.id}` : 'dataAddOption'
+
+                if (!currentOption.name) {
+                    return this.addError(`${errorString}.name`)
+                }
+
+                if (currentOption.values.length == 0) {
+                    return this.addError(`${errorString}.value`)
+                }
+
+                for (let value of currentOption.values) {
+                    if (!value.label) {
+                        return this.addError(`${errorString}.values.${value.id}`)
+                    }
+                }
+
+                if (!option) {
+                    this.state.options.push({
+                        id: uuidv7(),
+                        name: currentOption.name,
+                        values: currentOption.values,
+                        edit: false,
+                        value: ''
+                    });
+                }
+
+                this.closeEditOption(option)
+                this.generateVariants()
+            },
+
             openEditOption(option) {
                 option.edit = true;
                 option.original = JSON.parse(JSON.stringify(option));
@@ -335,6 +323,13 @@
                     }
                 }
             },
+
+            deleteOption(id) {
+                this.state.options = this.state.options.filter(o => o.id != id)
+
+                this.generateVariants()
+            },
+
             //  ======== END OPTIONS ========
 
 
@@ -343,22 +338,33 @@
             generateVariants() {
                 if (!this.state.options.length) return;
 
-                let arrays = this.state.options.map(o => o.values.map(v => v.label));
+                let arrays = this.state.options.map(o => o.values);
                 let combos = this.cartesian(arrays);
 
-                this.state.variants = combos.map(c => ({
-                    name: c.join(' / '),
+                this.state.variants = combos.map(combo => ({
+                    id: uuidv7(),
+                    image: null,
+                    name: combo.labels.join(' / '),
                     price: null,
                     stock: null,
-                    sku: null,
                 }));
             },
 
             cartesian(arrays) {
-                return arrays.reduce((a, b) =>
-                    a.flatMap(d => b.map(e => [...(Array.isArray(d) ? d : [d]), e]))
+                return arrays.reduce(
+                    (acc, group) =>
+                    acc.flatMap(obj =>
+                        group.map(item => ({
+                            ids: [...obj.ids, item.id],
+                            labels: [...obj.labels, item.label]
+                        }))
+                    ),
+                    [{
+                        ids: [],
+                        labels: []
+                    }]
                 );
-            }
+            },
 
             //  ======== END VARIANTS ========
 
