@@ -10,6 +10,6 @@ if (!function_exists('settings')) {
 
         $settings = app('settings');
 
-        return $settings[$key] ?? $key;
+        return $settings[$key] ?? $default ?? $key;
     }
 }

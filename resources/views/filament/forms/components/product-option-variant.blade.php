@@ -162,29 +162,41 @@
                                         class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
                                         Stock
                                     </th>
-                                    <th scope="col"
-                                        class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">Action
-                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
                                 <template x-for="variant in state.variants" :key="variant.id">
                                     <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800"
-                                            x-text="variant.name"></td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                                            <x-filament::input.wrapper>
-                                                <x-filament::input type="text" />
-                                            </x-filament::input.wrapper>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 flex space-x-3 items-center">
+                                            <div
+                                                class="relative w-14 h-14 rounded border border-dashed border-primary-300 text-primary-600 overflow-hidden">
+                                                <label>
+                                                    <div x-show="!variant.previewUrl"
+                                                        class="w-full h-full flex items-center justify-center cursor-pointer">
+                                                        <x-tabler-cloud-upload />
+                                                        <input type="file" class="sr-only"
+                                                            @change="uploadVariantFile($event, variant)">
+                                                    </div>
+                                                    <img x-show="variant.previewUrl" :src="variant.previewUrl"
+                                                        class="w-full h-full object-cover pointer-events-none">
+                                                </label>
+                                                <div x-show="variant.loading"
+                                                    class="absolute w-full h-full top-0 left-0 flex items-center justify-center bg-white/90">
+                                                    <x-tabler-loader class="animate-spin" />
+                                                </div>
+                                            </div>
+                                            <span x-text="variant.name"></span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                             <x-filament::input.wrapper>
                                                 <x-filament::input type="text" />
                                             </x-filament::input.wrapper>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                                            <button type="button"
-                                                class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-hidden focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none">Delete</button>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                            <x-filament::input.wrapper>
+                                                <x-filament::input type="text" />
+                                            </x-filament::input.wrapper>
                                         </td>
                                     </tr>
                                 </template>
@@ -201,6 +213,7 @@
     import {
         v7 as uuidv7
     } from "https://cdn.jsdelivr.net/npm/uuid/dist/esm-browser/index.js";
+
     document.addEventListener('alpine:init', () => {
         Alpine.data('product_variants', ($wire, statePath) => ({
             state: $wire.$entangle(statePath),
@@ -341,13 +354,30 @@
                 let arrays = this.state.options.map(o => o.values);
                 let combos = this.cartesian(arrays);
 
-                this.state.variants = combos.map(combo => ({
-                    id: uuidv7(),
-                    image: null,
-                    name: combo.labels.join(' / '),
-                    price: null,
-                    stock: null,
-                }));
+                let oldIndex = {};
+                for (let v of this.state.variants) {
+                    oldIndex[v.ids?.join('-')] = v;
+                }
+
+                this.state.variants = combos.map(combo => {
+                    let key = combo.ids.join('-');
+                    let old = oldIndex[key];
+
+                    return old ? {
+                        ...old,
+                        name: combo.labels.join(' / '),
+                        ids: combo.ids
+                    } : {
+                        id: uuidv7(),
+                        ids: combo.ids,
+                        image: null,
+                        name: combo.labels.join(' / '),
+                        price: null,
+                        stock: null,
+                        loading: false,
+                        previewUrl: null
+                    };
+                });
             },
 
             cartesian(arrays) {
@@ -364,6 +394,26 @@
                         labels: []
                     }]
                 );
+            },
+
+            async uploadVariantFile(event, variant) {
+                try {
+                    variant.loading = true
+
+                    const file = event.target.files[0]
+                    if (!file) return;
+
+                    await $wire.upload('tmpFile', file, async (uploadedFilename) => {
+                        let url = await $wire.call('customUpload', variant.id);
+
+                        variant.previewUrl = url
+                        variant.loading = false
+                    }, () => {}, (event) => {}, () => {
+                        variant.loading = false
+                    })
+                } catch (e) {
+                    console.log(e)
+                }
             },
 
             //  ======== END VARIANTS ========
