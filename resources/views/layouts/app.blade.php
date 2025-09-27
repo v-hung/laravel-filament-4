@@ -53,7 +53,6 @@
         @include('partials.footer')
     </div>
 
-
     @include('partials.mobile-menu')
 
     <div class="loading-overlay">

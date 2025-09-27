@@ -176,10 +176,13 @@
                                                         class="w-full h-full flex items-center justify-center cursor-pointer">
                                                         <x-tabler-cloud-upload />
                                                         <input type="file" class="sr-only"
-                                                            @change="uploadVariantFile($event, variant)">
+                                                            @change="await variantUploadFile($event, variant)">
                                                     </div>
                                                     <img x-show="variant.previewUrl" :src="variant.previewUrl"
                                                         class="w-full h-full object-cover pointer-events-none">
+                                                    <x-heroicon-o-trash x-show="variant.previewUrl"
+                                                        class="absolute right-0 top-0 w-7 h-7 rounded p-1 text-red-600 hover:bg-red-100 cursor-pointer"
+                                                        @click="await variantRemoveFile(option)" />
                                                 </label>
                                                 <div x-show="variant.loading"
                                                     class="absolute w-full h-full top-0 left-0 flex items-center justify-center bg-white/90">
@@ -396,21 +399,34 @@
                 );
             },
 
-            async uploadVariantFile(event, variant) {
+            async variantUploadFile(event, variant) {
                 try {
-                    variant.loading = true
-
                     const file = event.target.files[0]
                     if (!file) return;
 
+                    variant.loading = true
+
                     await $wire.upload('tmpFile', file, async (uploadedFilename) => {
-                        let url = await $wire.call('customUpload', variant.id);
+                        let url = await $wire.call('variantUploadFile', variant.id);
 
                         variant.previewUrl = url
                         variant.loading = false
                     }, () => {}, (event) => {}, () => {
                         variant.loading = false
                     })
+                } catch (e) {
+                    console.log(e)
+                }
+            },
+
+            async variantRemoveFile(variant) {
+                try {
+                    variant.loading = true
+
+                    await $wire.call('variantRemoveFile', variant.id);
+
+                    variant.previewUrl = null
+                    variant.loading = false
                 } catch (e) {
                     console.log(e)
                 }

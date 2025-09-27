@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Shop\ProductController;
+use App\Http\Controllers\Site\AboutController;
+use App\Http\Controllers\Site\ContactController;
 use App\Http\Controllers\Site\HomeController;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
@@ -17,18 +20,16 @@ Route::middleware('auth')->group(function () {
 
 // home & pages
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/about-us', [HomeController::class, 'index'])->name('about');
-Route::get('/contact-us', [HomeController::class, 'index'])->name('contact');
-Route::get('/wishlist', [HomeController::class, 'index'])->name('wishlist');
-Route::get('/login', [HomeController::class, 'index'])->name('login');
+Route::get('/about-us', [AboutController::class, 'index'])->name('about');
+Route::get('/contact-us', [ContactController::class, 'index'])->name('contact');
 
 // shop / collections / products
 Route::get('/collections', [HomeController::class, 'index'])->name('collections');
 Route::get('/collections/{collection_slug}', [HomeController::class, 'index'])->name('collections.show');
 Route::get('/collections/{collection_slug}/products/{product_slug}', [HomeController::class, 'index'])->name('collections.products.show');
 
-Route::get('/shop', [HomeController::class, 'index'])->name('shop');
-Route::get('/products/{product_slug}', [HomeController::class, 'index'])->name('products.show');
+Route::get('/shop', [ProductController::class, 'shop'])->name('shop');
+Route::get('/products/{product_slug}', [ProductController::class, 'detail'])->name('products.detail');
 
 // content
 Route::get('/blogs/{blog_slug}', [HomeController::class, 'index'])->name('blogs.show');
@@ -40,6 +41,9 @@ Route::get('/cart', [HomeController::class, 'index'])->name('cart');
 Route::post('/cart/add', [HomeController::class, 'index'])->name('cart.add');
 Route::post('/cart/update', [HomeController::class, 'index'])->name('cart.update');
 Route::post('/cart/clear', [HomeController::class, 'index'])->name('cart.clear');
+
+// wishlist
+Route::get('/wishlist', [HomeController::class, 'index'])->name('wishlist');
 
 
 // Route::prefix('products')->name('products.')->group(function () {

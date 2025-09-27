@@ -9,19 +9,25 @@ trait HasProductOptionVariant
     public $tmpFile;
     public $variantFiles = [];
 
-    public function customUpload(string $id)
+    public function variantUploadFile(string $id)
     {
         if ($this->tmpFile instanceof TemporaryUploadedFile) {
 
             $this->variantFiles[$id] = $this->tmpFile;
 
-            // Trả về URL tạm (preview được)
             return $this->tmpFile->temporaryUrl();
-
-            // hoặc trả về đường dẫn file tạm
-            // return $this->tmpFile->getRealPath();
         }
 
         return null;
+    }
+
+    public function variantRemoveFile(string $id)
+    {
+        if (isset($this->variantFiles[$id])) {
+            unset($this->variantFiles[$id]);
+            return true;
+        }
+
+        return false;
     }
 }
