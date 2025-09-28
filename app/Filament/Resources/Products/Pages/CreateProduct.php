@@ -29,14 +29,13 @@ class CreateProduct extends CreateRecord
                 ->label($isActive ? "✅ $localeTranlate" : $localeTranlate)
                 ->color($isActive ? 'success' : 'gray')
                 ->action(function () use ($locale) {
-                    $oldLocale = $this->getActiveFormsLocale();
+                    $oldLocale = $this->getActiveActionsLocale();
 
                     /** @var SpatieLaravelTranslatablePlugin $plugin */
-                    $plugin = filament('spatie-laravel-translatable');
+                    $plugin = filament('spatie-translatable');
                     $localeLabel = $plugin->getLocaleLabel($oldLocale) ?? $oldLocale;
 
-                    $this->form->saveRelationships();
-                    $this->save(shouldRedirect: false, shouldSendSavedNotification: false);
+                    $this->create();
 
                     $this->setActiveLocale($locale);
 
