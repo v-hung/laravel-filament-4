@@ -63,7 +63,7 @@ class ProductForm
                     ->preload()
                     ->required(),
                 Section::make([
-                    ProductOptionVariant::make('variants'),
+                    ProductOptionVariant::make('option_variant'),
                 ])->columnSpan('full'),
                 Select::make('status')
                     ->options(ProductStatus::class)

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Forms\Components;
 
+use Closure;
 use Filament\Forms\Components\Field;
 
 class ProductOptionVariant extends Field
@@ -18,5 +19,22 @@ class ProductOptionVariant extends Field
         ]);
 
         $this->dehydrated(false);
+
+        $this->rules($this->validateState());
+    }
+
+    private function validateState(): array
+    {
+        return [
+            $this->name . '.options' => 'array',
+            $this->name . '.options.*.name' => 'required|string',
+            $this->name . '.options.*.values' => 'array|min:1',
+            $this->name . '.options.*.values.*.label' => 'required|string',
+
+            $this->name . '.variants' => 'array',
+            $this->name . '.variants.*.sku' => 'required|string',
+            $this->name . '.variants.*.price' => 'required|numeric',
+            $this->name . '.variants.*.values' => 'array|min:1',
+        ];
     }
 }

@@ -11,6 +11,14 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 class ProductRepository
 {
 
+    private const RELATIONS_WITH_OPTIONS_AND_VARIANTS = [
+        'options:id,product_id,name',
+        'options.values:id,product_option_id,value',
+        'variants:id,product_id,sku,price',
+        'variants.values:id,product_variant_id,product_option_value_id',
+        'variants.values.optionValue:id,product_option_id,value',
+    ];
+
     public static function search(ProductSearchParams $params, ?ProductOrderType $orderType = null): LengthAwarePaginator
     {
         $query = Product::query();
@@ -50,5 +58,61 @@ class ProductRepository
                 perPage: $params->perPage,
                 page: $params->page
             );
+    }
+
+    public function withOptionsAndVariants(Product $product): Product
+    {
+        $product->load(self::RELATIONS_WITH_OPTIONS_AND_VARIANTS);
+
+        return $this->transform($product);
+    }
+
+    public function getWithOptionsAndVariants(int $productId): ?Product
+    {
+        $product = Product::with(self::RELATIONS_WITH_OPTIONS_AND_VARIANTS)->find($productId);
+
+        if ($product != null) {
+            $product = $this->transform($product);
+        }
+
+        return $product;
+    }
+
+    /**
+     * @param  int[]  $productIds
+     * @return Product[]
+     */
+    public function listWithOptionsAndVariants(array $productIds): array
+    {
+        $products = Product::with(self::RELATIONS_WITH_OPTIONS_AND_VARIANTS)->whereIn('id', $productIds)->get();
+
+        return $products->map([$this, 'transform']);
+    }
+
+    private function transform(Product $product): Product
+    {
+        $product->setAttribute('options_raw', $product->options->map(fn($opt) => [
+            'id' => $opt->id,
+            'name' => $opt->name,
+            'values' => $opt->values->map(fn($val) => [
+                'id' => $val->id,
+                'label' => $val->label,
+            ])->toArray(),
+        ])->toArray());
+
+        $product->setAttribute('variants_raw', $product->variants->map(fn($variant) => [
+            'id' => $variant->id,
+            'image' => $variant->image,
+            'sku' => $variant->sku,
+            'price' => $variant->price,
+            'stock' => $variant->stock,
+            'values' => $variant->values->map(fn($val) => [
+                'id' => $val->id,
+                'value' => $val->optionValue->label,
+                'option_id' => $val->optionValue->product_option_id,
+            ])->toArray(),
+        ])->toArray());
+
+        return $product;
     }
 }

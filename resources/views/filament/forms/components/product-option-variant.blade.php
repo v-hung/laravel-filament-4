@@ -170,15 +170,15 @@
                                             <div
                                                 class="relative w-18 h-18 rounded border border-dashed border-primary-300 text-primary-600 overflow-hidden">
                                                 <label>
-                                                    <div x-show="!variant.previewUrl"
+                                                    <div x-show="!variant.image"
                                                         class="w-full h-full flex items-center justify-center cursor-pointer">
                                                         <x-tabler-cloud-upload />
                                                         <input type="file" class="sr-only"
                                                             @change="await variantUploadFile($event, variant)">
                                                     </div>
-                                                    <img x-show="variant.previewUrl" :src="variant.previewUrl"
+                                                    <img x-show="variant.image" :src="variant.image"
                                                         class="w-full h-full object-cover pointer-events-none">
-                                                    <x-heroicon-o-trash x-show="variant.previewUrl"
+                                                    <x-heroicon-o-trash x-show="variant.image"
                                                         class="absolute right-1 top-1 w-7 h-7 rounded p-1 text-red-600 hover:bg-red-100 cursor-pointer"
                                                         @click.prevent.stop="await variantRemoveFile(variant)" />
                                                 </label>
@@ -224,7 +224,7 @@
                 edit: false,
                 value: '',
             },
-            errors: [],
+            errors: @js($errors->toArray()),
 
             init() {
                 this.state.options = this.state.options.map(v => ({
@@ -232,6 +232,12 @@
                     edit: false,
                     value: '',
                     original: JSON.parse(JSON.stringify(v))
+                }));
+
+                this.state.variants = this.state.variants.map(v => ({
+                    ...v,
+                    label: combo.values.map(v => v.label).join('/'),
+                    loading: false
                 }));
             },
 
@@ -366,17 +372,16 @@
 
                     return old ? {
                         ...old,
-                        name: combo.labels.join(' / '),
-                        ids: combo.ids
+                        values: combo.values,
+                        label: combo.values.map(v => v.label).join('/'),
                     } : {
                         id: uuidv7(),
-                        ids: combo.ids,
                         image: null,
-                        name: combo.labels.join(' / '),
+                        values: combo.values,
+                        label: combo.values.map(v => v.label).join('/'),
                         price: null,
                         stock: null,
-                        loading: false,
-                        previewUrl: null
+                        loading: false
                     };
                 });
             },
@@ -385,15 +390,17 @@
                 return arrays.reduce(
                     (acc, group) =>
                     acc.flatMap(obj =>
-                        group.map(item => ({
-                            ids: [...obj.ids, item.id],
-                            labels: [...obj.labels, item.label]
-                        }))
+                        group.map(item => [
+                            ...obj,
+                            {
+                                id: item.id,
+                                label: item.label
+                            }
+                        ])
                     ),
-                    [{
-                        ids: [],
-                        labels: []
-                    }]
+                    [
+                        []
+                    ]
                 );
             },
 
@@ -407,7 +414,7 @@
                     await $wire.upload('tmpFile', file, async (uploadedFilename) => {
                         let url = await $wire.call('variantUploadFile', variant.id);
 
-                        variant.previewUrl = url
+                        variant.image = url
                         variant.loading = false
                     }, () => {}, (event) => {}, () => {
                         variant.loading = false
@@ -423,7 +430,7 @@
 
                     await $wire.call('variantRemoveFile', variant.id);
 
-                    variant.previewUrl = null
+                    variant.image = null
                     variant.loading = false
                 } catch (e) {
                     console.log(e)
