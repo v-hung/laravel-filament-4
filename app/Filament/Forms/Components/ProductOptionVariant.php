@@ -2,7 +2,6 @@
 
 namespace App\Filament\Forms\Components;
 
-use Closure;
 use Filament\Forms\Components\Field;
 
 class ProductOptionVariant extends Field
@@ -20,21 +19,34 @@ class ProductOptionVariant extends Field
 
         $this->dehydrated(false);
 
-        $this->rules($this->validateState());
+        $this->rules($this->validateStateRules());
     }
 
-    private function validateState(): array
+    private function validateStateRules(): \Closure
     {
-        return [
-            $this->name . '.options' => 'array',
-            $this->name . '.options.*.name' => 'required|string',
-            $this->name . '.options.*.values' => 'array|min:1',
-            $this->name . '.options.*.values.*.label' => 'required|string',
+        return fn(): \Closure => function (string $attribute, $value, \Closure $fail) {
+            $validator = \Illuminate\Support\Facades\Validator::make($value, [
+                'options' => 'array',
+                'options.*.name' => 'required|string',
+                'options.*.values' => 'array|min:1',
+                'options.*.values.*.label' => 'required|string',
 
-            $this->name . '.variants' => 'array',
-            $this->name . '.variants.*.sku' => 'required|string',
-            $this->name . '.variants.*.price' => 'required|numeric',
-            $this->name . '.variants.*.values' => 'array|min:1',
-        ];
+                'variants' => 'array',
+                'variants.*.sku' => 'string',
+                'variants.*.price' => 'required|numeric',
+                'variants.*.stock' => 'numeric',
+                'variants.*.values' => 'array|min:1',
+                'variants.*.image_file' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120'
+            ]);
+
+            if ($validator->fails()) {
+                foreach ($validator->errors()->messages() as $key => $messages) {
+                    foreach ($messages as $message) {
+                        $prefixedKey = 'data.' . $this->name . '.' . $key;
+                        $fail($prefixedKey, $message);
+                    }
+                }
+            }
+        };
     }
 }

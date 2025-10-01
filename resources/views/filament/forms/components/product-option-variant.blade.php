@@ -187,12 +187,14 @@
                                                     <x-tabler-loader class="animate-spin" />
                                                 </div>
                                             </div>
-                                            <span x-text="variant.name"></span>
+                                            <span x-text="variant.label"></span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                             <x-filament::input.wrapper>
-                                                <x-filament::input type="text" />
+                                                <x-filament::input type="text" x-mask:dynamic="$money($input)"
+                                                    required />
                                             </x-filament::input.wrapper>
+                                            <p class="fi-fo-field-wrp-error-message">Error</p>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                             <x-filament::input.wrapper>
@@ -363,24 +365,25 @@
 
                 let oldIndex = {};
                 for (let v of this.state.variants) {
-                    oldIndex[v.ids?.join('-')] = v;
+                    let key = v.values.map(c => c.id).join('-');
+                    oldIndex[key] = v;
                 }
 
                 this.state.variants = combos.map(combo => {
-                    let key = combo.ids.join('-');
+                    let key = combo.map(c => c.id).join('-');
                     let old = oldIndex[key];
 
                     return old ? {
                         ...old,
-                        values: combo.values,
-                        label: combo.values.map(v => v.label).join('/'),
+                        values: combo,
+                        label: combo.map(v => v.label).join('/'),
                     } : {
                         id: uuidv7(),
                         image: null,
-                        values: combo.values,
-                        label: combo.values.map(v => v.label).join('/'),
-                        price: null,
-                        stock: null,
+                        values: combo,
+                        label: combo.map(v => v.label).join('/'),
+                        price: 0,
+                        stock: 0,
                         loading: false
                     };
                 });
