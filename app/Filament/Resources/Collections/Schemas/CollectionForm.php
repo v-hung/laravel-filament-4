@@ -36,7 +36,8 @@ class CollectionForm
                     }),
                 TextInput::make('description')->maxLength(255)->columnSpan('full'),
                 Select::make('status')
-                    ->options(CategoryStatus::class),
+                    ->options(CategoryStatus::class)
+                    ->default(CategoryStatus::Active),
             ]);
     }
 }

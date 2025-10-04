@@ -55,7 +55,6 @@ class CollectionResource extends Resource
         return [
             'index' => ListCollections::route('/'),
             'create' => CreateCollection::route('/create'),
-            'view' => ViewCollection::route('/{record}'),
             'edit' => EditCollection::route('/{record}/edit'),
         ];
     }

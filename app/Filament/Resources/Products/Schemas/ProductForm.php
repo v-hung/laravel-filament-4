@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Products\Schemas;
 use App\Enums\ProductStatus;
 use App\Filament\Forms\Components\ProductOptionVariant;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -20,7 +21,8 @@ class ProductForm
     {
         return $schema
             ->components([
-                TextInput::make('title')
+                Hidden::make('has_variant'),
+                TextInput::make('name')
                     ->maxLength(255)
                     ->required()
                     ->live(onBlur: true)
@@ -43,9 +45,8 @@ class ProductForm
                     ->columnSpan('full')
                     ->extraInputAttributes(['style' => 'min-height: 20rem;']),
                 FileUpload::make('images')
-                    ->multiple(),
+                    ->multiple()->columnSpan('full'),
                 TextInput::make('compare_at_price')
-                    ->required()
                     ->numeric()
                     ->prefix('$'),
                 TextInput::make('price')

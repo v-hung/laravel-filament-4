@@ -3,6 +3,7 @@
 namespace App\Filament\Forms\Components;
 
 use App\Repositories\ProductRepository;
+use App\Services\ProductService;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -13,30 +14,8 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
  */
 trait HasProductOptionVariant
 {
-    public $tmpFile;
-    public $variantFiles = [];
 
-    public function variantUploadFile(string $id)
-    {
-        if ($this->tmpFile instanceof TemporaryUploadedFile) {
-
-            $this->variantFiles[$id] = $this->tmpFile;
-
-            return $this->tmpFile->temporaryUrl();
-        }
-
-        return null;
-    }
-
-    public function variantRemoveFile(string $id)
-    {
-        if (isset($this->variantFiles[$id])) {
-            unset($this->variantFiles[$id]);
-            return true;
-        }
-
-        return false;
-    }
+    public array $optionVariantCache = [];
 
     protected function afterFill(): void
     {
@@ -44,6 +23,7 @@ trait HasProductOptionVariant
             $product = app(ProductRepository::class)->withOptionsAndVariants($this->record);
 
             $this->form->fill([
+                ...$this->form->getRawState(),
                 'option_variant' => [
                     'options' => $product->options_raw,
                     'variants' => $product->variants_raw,
@@ -52,27 +32,41 @@ trait HasProductOptionVariant
         }
     }
 
+    protected function beforeValidate(): void
+    {
+        $state = $this->form->getRawState()['option_variant'] ?? null;
+
+        $this->form->fill([
+            ...$this->form->getRawState(),
+            'has_variant' => !empty($state['variants'] ?? [])
+        ]);
+
+        $this->optionVariantCache = $this->form->getRawState()['option_variant'] ?? [];
+    }
+
     protected function afterCreate(): void
     {
-        DB::beginTransaction();
+        $this->saveOptionVariant();
+    }
 
+    protected function afterSave(): void
+    {
+        $this->saveOptionVariant();
+    }
+
+    private function saveOptionVariant()
+    {
         try {
-            $state = $this->form->getState()['option_variant'] ?? null;
+            $state = $this->optionVariantCache;
 
             if ($state) {
-                foreach ($state['options'] as $option) {
-                    if (empty($option)) {
-                        throw ValidationException::withMessages([
-                            'option_variant.options' => 'Tên option không được để trống.',
-                        ]);
-                    }
-                    $this->record->options()->create(['name' => $option]);
-                }
+                app(ProductService::class)->saveOptionsVariants(
+                    $state['options'] ?? [],
+                    $state['variants'] ?? [],
+                    $this->record->id
+                );
             }
-
-            DB::commit();
         } catch (ValidationException $e) {
-            DB::rollBack();
             Notification::make()
                 ->warning()
                 ->title('You don\'t have an active subscription!')
@@ -81,6 +75,8 @@ trait HasProductOptionVariant
                 ->send();
 
             $this->halt();
+        } finally {
+            $this->optionVariantCache = [];
         }
     }
 }

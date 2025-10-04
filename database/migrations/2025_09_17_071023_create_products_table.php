@@ -19,7 +19,8 @@ return new class extends Migration
             $table->json('content')->nullable();
             $table->json('images')->nullable();
             $table->decimal('price', 15, 2);
-            $table->decimal('compare_at_price', 15, 2);
+            $table->boolean('has_variant')->default(false);
+            $table->decimal('compare_at_price', 15, 2)->nullable();
             $table->integer('stock_quantity')->default(0);
             $table->string('status')->nullable();
             $table->timestamps();

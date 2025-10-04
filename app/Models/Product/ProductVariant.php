@@ -9,13 +9,13 @@ class ProductVariant extends Model
 {
     protected $guarded = [];
 
-    public function values()
-    {
-        return $this->belongsToMany(ProductOptionValue::class, 'product_variant_values');
-    }
-
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function values()
+    {
+        return $this->belongsToMany(ProductOptionValue::class, 'product_variant_values');
     }
 }

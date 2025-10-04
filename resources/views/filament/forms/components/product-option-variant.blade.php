@@ -49,6 +49,7 @@
                                             x-bind:class="errors.includes(`options.${option.id}.values.${value.id}`) ?
                                                 'fi-invalid' : ''">
                                             <x-filament::input type="text" x-model="value.label"
+                                                @keydown.enter.prevent.stop=""
                                                 @input="removeError(`options.${option.id}.values.${value.id}`)" />
                                             <x-slot name="suffix">
                                                 <x-heroicon-o-trash
@@ -167,13 +168,13 @@
                                     <tr>
                                         <td
                                             class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 flex space-x-3 items-center">
-                                            <div
+                                            {{-- <div
                                                 class="relative w-18 h-18 rounded border border-dashed border-primary-300 text-primary-600 overflow-hidden">
                                                 <label>
                                                     <div x-show="!variant.image"
                                                         class="w-full h-full flex items-center justify-center cursor-pointer">
                                                         <x-tabler-cloud-upload />
-                                                        <input type="file" class="sr-only"
+                                                        <input type="file" class="sr-only" x-model
                                                             @change="await variantUploadFile($event, variant)">
                                                     </div>
                                                     <img x-show="variant.image" :src="variant.image"
@@ -182,23 +183,19 @@
                                                         class="absolute right-1 top-1 w-7 h-7 rounded p-1 text-red-600 hover:bg-red-100 cursor-pointer"
                                                         @click.prevent.stop="await variantRemoveFile(variant)" />
                                                 </label>
-                                                <div x-show="variant.loading"
-                                                    class="absolute w-full h-full top-0 left-0 flex items-center justify-center bg-white/90">
-                                                    <x-tabler-loader class="animate-spin" />
-                                                </div>
-                                            </div>
+                                            </div> --}}
                                             <span x-text="variant.label"></span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                             <x-filament::input.wrapper>
-                                                <x-filament::input type="text" x-mask:dynamic="$money($input)"
-                                                    required />
+                                                <x-filament::input type="text" {{-- x-mask:dynamic="$money($input)" --}} required
+                                                    x-model="variant.price" />
                                             </x-filament::input.wrapper>
-                                            <p class="fi-fo-field-wrp-error-message">Error</p>
+                                            {{-- <p class="fi-fo-field-wrp-error-message">Error</p> --}}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                             <x-filament::input.wrapper>
-                                                <x-filament::input type="text" />
+                                                <x-filament::input type="text" x-model="variant.stock" />
                                             </x-filament::input.wrapper>
                                         </td>
                                     </tr>
@@ -238,8 +235,7 @@
 
                 this.state.variants = this.state.variants.map(v => ({
                     ...v,
-                    label: combo.values.map(v => v.label).join('/'),
-                    loading: false
+                    label: combo.values.map(v => v.label).join('/')
                 }));
             },
 
@@ -383,8 +379,7 @@
                         values: combo,
                         label: combo.map(v => v.label).join('/'),
                         price: 0,
-                        stock: 0,
-                        loading: false
+                        stock: 0
                     };
                 });
             },
@@ -408,36 +403,20 @@
             },
 
             async variantUploadFile(event, variant) {
-                try {
-                    const file = event.target.files[0]
-                    if (!file) return;
+                const file = event.target.files[0]
+                if (!file) return;
 
-                    variant.loading = true
-
-                    await $wire.upload('tmpFile', file, async (uploadedFilename) => {
-                        let url = await $wire.call('variantUploadFile', variant.id);
-
-                        variant.image = url
-                        variant.loading = false
-                    }, () => {}, (event) => {}, () => {
-                        variant.loading = false
-                    })
-                } catch (e) {
-                    console.log(e)
-                }
+                variant.image_file = file
+                variant.image = URL.createObjectURL(file);
             },
 
             async variantRemoveFile(variant) {
-                try {
-                    variant.loading = true
-
-                    await $wire.call('variantRemoveFile', variant.id);
-
-                    variant.image = null
-                    variant.loading = false
-                } catch (e) {
-                    console.log(e)
+                if (variant.image) {
+                    URL.revokeObjectURL(variant.image);
                 }
+
+                variant.image_file = null
+                variant.image = null;
             },
 
             //  ======== END VARIANTS ========

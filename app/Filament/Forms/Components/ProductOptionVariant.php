@@ -29,6 +29,7 @@ class ProductOptionVariant extends Field
                 'options' => 'array',
                 'options.*.name' => 'required|string',
                 'options.*.values' => 'array|min:1',
+                'options.*.values.*.id' => 'required',
                 'options.*.values.*.label' => 'required|string',
 
                 'variants' => 'array',
@@ -36,6 +37,7 @@ class ProductOptionVariant extends Field
                 'variants.*.price' => 'required|numeric',
                 'variants.*.stock' => 'numeric',
                 'variants.*.values' => 'array|min:1',
+                'variants.*.values.*.id' => 'required',
                 'variants.*.image_file' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:5120'
             ]);
 
