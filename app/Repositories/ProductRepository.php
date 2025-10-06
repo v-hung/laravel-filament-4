@@ -12,11 +12,14 @@ class ProductRepository
 {
 
     private const RELATIONS_WITH_OPTIONS_AND_VARIANTS = [
-        'options:id,product_id,name',
-        'options.values:id,product_option_id,value',
-        'variants:id,product_id,sku,price',
+        // Options và các values
+        'options:id,product_id,name,position',
+        'options.values:id,product_option_id,label,position',
+
+        // Variants và các values của nó
+        'variants:id,product_id,image,sku,price,stock',
         'variants.values:id,product_variant_id,product_option_value_id',
-        'variants.values.optionValue:id,product_option_id,value',
+        'variants.values.optionValue:id,product_option_id,label',
     ];
 
     public static function search(ProductSearchParams $params, ?ProductOrderType $orderType = null): LengthAwarePaginator
@@ -91,13 +94,17 @@ class ProductRepository
 
     private function transform(Product $product): Product
     {
-        $product->setAttribute('options_raw', $product->options->map(fn($opt) => [
+        $sortedOptions = $product->options->sortBy('position');
+
+        $product->setAttribute('options_raw', $sortedOptions->map(fn($opt) => [
             'id' => $opt->id,
             'name' => $opt->name,
-            'values' => $opt->values->map(fn($val) => [
-                'id' => $val->id,
-                'label' => $val->label,
-            ])->toArray(),
+            'values' => $opt->values
+                ->sortBy('position')
+                ->map(fn($val) => [
+                    'id' => $val->id,
+                    'label' => $val->label,
+                ])->toArray(),
         ])->toArray());
 
         $product->setAttribute('variants_raw', $product->variants->map(fn($variant) => [
@@ -108,7 +115,7 @@ class ProductRepository
             'stock' => $variant->stock,
             'values' => $variant->values->map(fn($val) => [
                 'id' => $val->id,
-                'value' => $val->optionValue->label,
+                'label' => $val->optionValue->label,
                 'option_id' => $val->optionValue->product_option_id,
             ])->toArray(),
         ])->toArray());

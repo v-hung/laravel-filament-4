@@ -235,7 +235,7 @@
 
                 this.state.variants = this.state.variants.map(v => ({
                     ...v,
-                    label: combo.values.map(v => v.label).join('/')
+                    label: v.values.map(v => v.label).join('/')
                 }));
             },
 
@@ -391,7 +391,7 @@
                         group.map(item => [
                             ...obj,
                             {
-                                id: item.id,
+                                option_id: item.id,
                                 label: item.label
                             }
                         ])

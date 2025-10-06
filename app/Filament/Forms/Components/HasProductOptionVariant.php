@@ -5,9 +5,7 @@ namespace App\Filament\Forms\Components;
 use App\Repositories\ProductRepository;
 use App\Services\ProductService;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 /**
  * @property \App\Models\Product $record
@@ -57,12 +55,12 @@ trait HasProductOptionVariant
     private function saveOptionVariant()
     {
         try {
-            $state = $this->optionVariantCache;
+            $optionVariant = $this->optionVariantCache;
 
-            if ($state) {
+            if ($optionVariant) {
                 app(ProductService::class)->saveOptionsVariants(
-                    $state['options'] ?? [],
-                    $state['variants'] ?? [],
+                    $optionVariant['options'] ?? [],
+                    $optionVariant['variants'] ?? [],
                     $this->record->id
                 );
             }
@@ -76,6 +74,12 @@ trait HasProductOptionVariant
 
             $this->halt();
         } finally {
+
+            $this->form->fill([
+                ...$this->form->getRawState(),
+                'option_variant' => $this->optionVariantCache
+            ]);
+
             $this->optionVariantCache = [];
         }
     }

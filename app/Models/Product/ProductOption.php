@@ -18,6 +18,6 @@ class ProductOption extends Model
 
     public function values(): HasMany
     {
-        return $this->hasMany(ProductOptionValue::class);
+        return $this->hasMany(ProductOptionValue::class, 'product_option_id');
     }
 }

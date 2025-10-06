@@ -26,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         FilamentAsset::register([
             Js::make('apline-sort', __DIR__ . '/../../resources/js/alpine-plugin/alpine.sort.min.js'),
-            Js::make('apline-sort', __DIR__ . '/../../resources/js/alpine-plugin/alpine.mask.min.js'),
+            // Js::make('apline-mask', __DIR__ . '/../../resources/js/alpine-plugin/alpine.mask.min.js'),
         ]);
 
         if (!$this->app->runningInConsole()) {

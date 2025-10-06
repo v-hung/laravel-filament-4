@@ -61,8 +61,7 @@ class ProductForm
                     ->relationship('collections', 'title')
                     ->multiple()
                     ->searchable()
-                    ->preload()
-                    ->required(),
+                    ->preload(),
                 Section::make([
                     ProductOptionVariant::make('option_variant'),
                 ])->columnSpan('full'),
