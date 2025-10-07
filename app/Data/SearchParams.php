@@ -11,16 +11,30 @@ class SearchParams
     public string $sortBy = 'id';
     public string $sortDirection = 'desc';
 
-    public function __construct(array $data = [])
-    {
-        $this->perPage = isset($data['per_page']) ? (int) $data['per_page'] : 15;
-        $this->page = isset($data['page']) ? (int) $data['page'] : 1;
-        $this->sortBy = $data['sort_by'] ?? 'id';
-        $this->sortDirection = strtolower($data['sort_direction'] ?? 'desc');
-    }
-
     public static function fromRequest(Request $request): static
     {
-        return new static($request->all());
+        $instance = new static();
+        foreach ($instance->toArray() as $key => $_) {
+            if ($request->has($key)) {
+                $instance->$key = $request->input($key);
+            }
+        }
+        return $instance;
+    }
+
+    public static function fromArray(array $data): static
+    {
+        $instance = new static();
+        foreach ($data as $key => $value) {
+            if (property_exists($instance, $key)) {
+                $instance->$key = $value;
+            }
+        }
+        return $instance;
+    }
+
+    public function toArray(): array
+    {
+        return get_object_vars($this);
     }
 }

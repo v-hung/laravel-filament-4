@@ -9,47 +9,35 @@ use Livewire\Component;
 
 class ProductList extends Component
 {
-    public ProductSearchParams $params;
-    private $paramArr = [];
+    public array $paramArr = [];
+
+    protected ProductSearchParams $params;
 
     protected $queryString = ['paramArr'];
 
-    public function mount(Request $request)
+    public function mount(Request $request): void
     {
         $this->params = ProductSearchParams::fromRequest($request);
-        $this->paramArr = get_object_vars($this->params);
+        $this->paramArr = $this->params->toArray();
     }
 
-    public function updating($name, $value)
+    public function updating($name, $value): void
     {
-        if (!in_array($name, ['params.page'])) {
-            $this->params->page = 1;
+        if ($name !== 'paramArr.page') {
+            $this->paramArr['page'] = 1;
         }
-        $this->paramArr = get_object_vars($this->params);
 
-        // // So sánh từng key ngoại trừ 'page'
-        // foreach ($current as $key => $value) {
-        //     if ($key !== 'page' && ($this->oldParams[$key] ?? null) !== $value) {
-        //         // Filter thay đổi → reset page
-        //         $this->params->page = 1;
-        //         break;
-        //     }
-        // }
-
-        // // Cập nhật snapshot
-        // $this->oldParams = $current;
+        $this->params = ProductSearchParams::fromArray($this->paramArr);
     }
-
-    // public function updatingParams()
-    // {
-    // }
 
     public function render()
     {
+        $this->params = ProductSearchParams::fromArray($this->paramArr);
+
         $products = ProductRepository::search($this->params);
 
         return view('livewire.product-list', [
-            'products' => $products
+            'products' => $products,
         ]);
     }
 }

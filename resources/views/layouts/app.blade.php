@@ -44,16 +44,16 @@
 
 <body>
     <div class="page-wrapper">
-        @include('partials.header')
+        @include('layouts.partials.header')
 
         <main class="main">
             {{ $slot }}
         </main>
 
-        @include('partials.footer')
+        @include('layouts.partials.footer')
     </div>
 
-    @include('partials.mobile-menu')
+    @include('layouts.partials.mobile-menu')
 
     <div class="loading-overlay">
         <div class="bounce-loader">

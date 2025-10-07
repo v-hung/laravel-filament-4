@@ -18,8 +18,7 @@ class ProductRepository
 
         // Variants và các values của nó
         'variants:id,product_id,image,sku,price,stock',
-        'variants.values:id,product_variant_id,product_option_value_id',
-        'variants.values.optionValue:id,product_option_id,label',
+        'variants.values:id,product_option_id,label'
     ];
 
     public static function search(ProductSearchParams $params, ?ProductOrderType $orderType = null): LengthAwarePaginator
@@ -115,8 +114,8 @@ class ProductRepository
             'stock' => $variant->stock,
             'values' => $variant->values->map(fn($val) => [
                 'id' => $val->id,
-                'label' => $val->optionValue->label,
-                'option_id' => $val->optionValue->product_option_id,
+                'label' => $val->label,
+                'option_id' => $val->product_option_id,
             ])->toArray(),
         ])->toArray());
 
